@@ -7,6 +7,7 @@ import com.cao.reggie.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +28,7 @@ public class EmployeeController {
      * @return 登录信息
      */
 
-    @RequestMapping("/login")
+    @PostMapping("/login")
     public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee){
         //1、将页面提交的密码password进行md5加密处理
         String password = employee.getPassword();
@@ -51,6 +52,16 @@ public class EmployeeController {
         //6、登录成功，将员工id存入Session并返回登录成功结果
         request.getSession().setAttribute("employee",getEmployee.getId());
         return R.success(getEmployee);
+    }
 
+    /**
+     * 用户退出
+     * @param request
+     * @return 状态信息
+     */
+    @PostMapping("/logout")
+    public R<String> logout(HttpServletRequest request){
+        request.getSession().removeAttribute("employee");
+        return R.success("退出成功");
     }
 }
