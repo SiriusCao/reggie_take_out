@@ -118,4 +118,23 @@ public class EmployeeController {
 
         return R.success(pageInfo);
     }
+
+    /**
+     * 修改员工的状态
+     *
+     * @param request  请求体
+     * @param employee 需要更改的信息
+     * @return 更改状态
+     */
+    @PutMapping
+    public R<String> setStatus(HttpServletRequest request, @RequestBody Employee employee) {
+        //获取当前修改人
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        employee.setUpdateUser(empId);
+        //设置当前修改时间
+        employee.setUpdateTime(LocalDateTime.now());
+        //更新状态
+        employeeService.updateById(employee);
+        return R.success("员工信息修改成功");
+    }
 }
