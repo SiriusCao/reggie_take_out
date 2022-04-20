@@ -12,7 +12,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -70,12 +69,11 @@ public class EmployeeController {
     /**
      * 新增员工
      *
-     * @param request  HTTP请求
      * @param employee 员工数据
      * @return 状态信息
      */
     @PostMapping
-    public R<String> add(HttpServletRequest request, @RequestBody Employee employee) {
+    public R<String> add(@RequestBody Employee employee) {
         //设置初始密码
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
 
@@ -113,12 +111,11 @@ public class EmployeeController {
     /**
      * 修改员工的状态
      *
-     * @param request  请求体
      * @param employee 需要更改的信息
      * @return 更改状态
      */
     @PutMapping
-    public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
+    public R<String> update(@RequestBody Employee employee) {
         //更新状态
         employeeService.updateById(employee);
         return R.success("员工信息修改成功");
