@@ -78,15 +78,6 @@ public class EmployeeController {
     public R<String> add(HttpServletRequest request, @RequestBody Employee employee) {
         //设置初始密码
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-        //设置时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-
-        //获得当前用户的ID
-        Long empId = (Long) request.getSession().getAttribute("employee");
-        //设置新账号的创建人
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
 
         //保存数据
         employeeService.save(employee);
@@ -128,11 +119,6 @@ public class EmployeeController {
      */
     @PutMapping
     public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
-        //获取当前修改人
-        Long empId = (Long) request.getSession().getAttribute("employee");
-        employee.setUpdateUser(empId);
-        //设置当前修改时间
-        employee.setUpdateTime(LocalDateTime.now());
         //更新状态
         employeeService.updateById(employee);
         return R.success("员工信息修改成功");
