@@ -127,7 +127,7 @@ public class EmployeeController {
      * @return 更改状态
      */
     @PutMapping
-    public R<String> setStatus(HttpServletRequest request, @RequestBody Employee employee) {
+    public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
         //获取当前修改人
         Long empId = (Long) request.getSession().getAttribute("employee");
         employee.setUpdateUser(empId);
@@ -136,5 +136,15 @@ public class EmployeeController {
         //更新状态
         employeeService.updateById(employee);
         return R.success("员工信息修改成功");
+    }
+
+    @GetMapping("/{id}")
+    public R<Employee> queryEmployeeById(@PathVariable Long id){
+        //根据ID获得employee对象
+        Employee employee = employeeService.getById(id);
+        if (employee!=null){
+            return R.success(employee);
+        }
+        return R.error("未查询到员工信息");
     }
 }
