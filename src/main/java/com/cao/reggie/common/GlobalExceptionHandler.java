@@ -28,9 +28,9 @@ public class GlobalExceptionHandler {
         //获取异常信息
         String message = exception.getMessage();
         log.error(message);
-        //判断是不是用户名重复插入导致的异常
+        //判断是不是重复插入导致的异常
         if (message.contains("Duplicate entry")) {
-            return R.error("用户名" + message.split(" ")[2] + "已存在");
+            return R.error(message.split(" ")[2] + "已存在");
         }
         return R.error("未知错误");
     }
