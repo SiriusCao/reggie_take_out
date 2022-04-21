@@ -46,6 +46,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         }
 
         //以上情况均不符合，删除该分类
-        this.removeById(id);
+        boolean b = this.removeById(id);
+        if (!b){
+            throw new CustomException("删除失败");
+        }
     }
 }
