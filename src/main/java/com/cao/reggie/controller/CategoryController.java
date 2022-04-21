@@ -55,6 +55,7 @@ public class CategoryController {
 
     /**
      * 删除分类
+     *
      * @param id 分类ID
      * @return
      */
@@ -63,5 +64,15 @@ public class CategoryController {
         log.info("删除分类{}", id);
         categoryService.removeAfterCheck(id);
         return R.success("");
+    }
+
+    @PutMapping
+    public R<String> update(@RequestBody Category category) {
+        log.info("修改{}", category.toString());
+        boolean b = categoryService.updateById(category);
+        if (b) {
+            return R.success("");
+        }
+        return R.error("更新失败");
     }
 }
