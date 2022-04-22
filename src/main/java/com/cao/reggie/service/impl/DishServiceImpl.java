@@ -81,4 +81,23 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dishDtoPage.setRecords(dishDtoRecords);
         return dishDtoPage;
     }
+
+    @Override
+    public DishDto findByIdWithFlavors(Long id) {
+        //根据Id查询dish
+        Dish dish = this.getById(id);
+        //new一个dishDTO并赋值数据
+        DishDto dishDto=new DishDto();
+        BeanUtils.copyProperties(dish,dishDto);
+
+        //根据dishId查询口味
+        LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(id!=null,DishFlavor::getDishId,id);
+        List<DishFlavor> flavors = dishFlavorService.list(queryWrapper);
+
+        //将口味赋值给dishDTO
+        dishDto.setFlavors(flavors);
+
+        return dishDto;
+    }
 }

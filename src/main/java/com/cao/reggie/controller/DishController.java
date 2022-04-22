@@ -35,4 +35,10 @@ public class DishController {
         Page<DishDto> dishDtoPage = dishService.pageWithCategoryName(page, pageSize, name);
         return R.success(dishDtoPage);
     }
+
+    @GetMapping("/{id}")
+    public R<DishDto> findById(@PathVariable Long id){
+        DishDto dishDto=dishService.findByIdWithFlavors(id);
+        return R.success(dishDto);
+    }
 }

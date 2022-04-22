@@ -11,4 +11,7 @@ public interface DishService extends IService<Dish> {
 
     //查询菜品同时查询分类名
     public Page<DishDto> pageWithCategoryName(int page, int pageSize, String name);
+
+    //根据菜品Id查询菜品及其口味
+    public DishDto findByIdWithFlavors(Long id);
 }
