@@ -15,12 +15,14 @@ import com.cao.reggie.service.DishService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
     @Autowired
     private DishFlavorService dishFlavorService;
@@ -99,5 +101,26 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dishDto.setFlavors(flavors);
 
         return dishDto;
+    }
+
+    @Override
+    public void updateWithFlavor(DishDto dishDto) {
+        //更新菜品表
+        this.updateById(dishDto);//因为dishDTO是dish的子类，所以可以直接传入
+
+        //清空旧的口味表
+        LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(dishDto!=null,DishFlavor::getDishId,dishDto.getId());
+        dishFlavorService.remove(queryWrapper);
+
+        //新增新的口味
+        List<DishFlavor> flavors = dishDto.getFlavors();
+        //向新的口味中写入对应的dishID
+        flavors = flavors.stream().map(flavor -> {
+            flavor.setDishId(dishDto.getId());
+            return flavor;
+        }).collect(Collectors.toList());
+        //保存更新的口味
+        dishFlavorService.saveBatch(flavors);
     }
 }

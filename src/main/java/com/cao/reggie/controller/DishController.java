@@ -4,6 +4,7 @@ package com.cao.reggie.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cao.reggie.common.R;
 import com.cao.reggie.dto.DishDto;
+import com.cao.reggie.entity.Dish;
 import com.cao.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,5 +41,12 @@ public class DishController {
     public R<DishDto> findById(@PathVariable Long id){
         DishDto dishDto=dishService.findByIdWithFlavors(id);
         return R.success(dishDto);
+    }
+
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto){
+        log.info("更新菜品信息{}",dishDto.toString());
+        dishService.updateWithFlavor(dishDto);
+        return R.success("更新菜品成功");
     }
 }
