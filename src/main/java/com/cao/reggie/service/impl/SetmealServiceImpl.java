@@ -1,12 +1,17 @@
 package com.cao.reggie.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cao.reggie.dto.SetmealDto;
+import com.cao.reggie.entity.Category;
 import com.cao.reggie.entity.Setmeal;
 import com.cao.reggie.entity.SetmealDish;
 import com.cao.reggie.mapper.SetmealMapper;
+import com.cao.reggie.service.CategoryService;
 import com.cao.reggie.service.SetmealDishService;
 import com.cao.reggie.service.SetmealService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +22,9 @@ import java.util.stream.Collectors;
 public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> implements SetmealService {
     @Autowired
     private SetmealDishService setmealDishService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @Override
     public void saveWithDish(SetmealDto setmealDto) {
@@ -33,5 +41,34 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
         //插入套餐菜品信息
         setmealDishService.saveBatch(setmealDishes);
+    }
+
+    @Override
+    public Page<SetmealDto> pageWithCategoryName(int page, int pageSize, String name) {
+        Page<Setmeal> setmealPage=new Page<>(page,pageSize);
+
+        LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.like(name!=null,Setmeal::getName,name);
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+
+        this.page(setmealPage,queryWrapper);
+
+        Page<SetmealDto> setmealDtoPage=new Page<>();
+
+        BeanUtils.copyProperties(setmealPage,setmealDtoPage,"records");
+
+        List<Setmeal> setmealList = setmealPage.getRecords();
+        List<SetmealDto> setmealDtoList = setmealList.stream().map(item -> {
+            SetmealDto setmealDto = new SetmealDto();
+            BeanUtils.copyProperties(item, setmealDto);
+            Category category = categoryService.getById(item.getCategoryId());
+            if (category != null) {
+                setmealDto.setCategoryName(category.getName());
+            }
+            return setmealDto;
+        }).collect(Collectors.toList());
+
+        setmealDtoPage.setRecords(setmealDtoList);
+        return setmealDtoPage;
     }
 }
