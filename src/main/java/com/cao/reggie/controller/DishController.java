@@ -56,7 +56,7 @@ public class DishController {
     /**
      * 根据categoryId查询菜品
      *
-     * @param categoryId
+     * @param dish
      * @return
      */
     @GetMapping("/list")

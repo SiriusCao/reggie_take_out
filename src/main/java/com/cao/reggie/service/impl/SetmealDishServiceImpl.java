@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cao.reggie.entity.SetmealDish;
 import com.cao.reggie.mapper.SetmealDishMapper;
 import com.cao.reggie.service.SetmealDishService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, SetmealDish> implements SetmealDishService {
 }
