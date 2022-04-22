@@ -1,6 +1,7 @@
 package com.cao.reggie.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cao.reggie.common.R;
 import com.cao.reggie.dto.DishDto;
@@ -9,6 +10,8 @@ import com.cao.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -38,15 +41,32 @@ public class DishController {
     }
 
     @GetMapping("/{id}")
-    public R<DishDto> findById(@PathVariable Long id){
-        DishDto dishDto=dishService.findByIdWithFlavors(id);
+    public R<DishDto> findById(@PathVariable Long id) {
+        DishDto dishDto = dishService.findByIdWithFlavors(id);
         return R.success(dishDto);
     }
 
     @PutMapping
-    public R<String> update(@RequestBody DishDto dishDto){
-        log.info("更新菜品信息{}",dishDto.toString());
+    public R<String> update(@RequestBody DishDto dishDto) {
+        log.info("更新菜品信息{}", dishDto.toString());
         dishService.updateWithFlavor(dishDto);
         return R.success("更新菜品成功");
+    }
+
+    /**
+     * 根据categoryId查询菜品
+     *
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> listByCategoryId(Dish dish) {
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Dish::getCategoryId,dish.getCategoryId());
+        //只查询在售状态的
+        queryWrapper.eq(Dish::getStatus,1);
+        queryWrapper.orderByAsc(Dish::getSort).orderByAsc(Dish::getUpdateTime);
+        List<Dish> dishList = dishService.list(queryWrapper);
+        return R.success(dishList);
     }
 }
