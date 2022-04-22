@@ -49,20 +49,20 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Override
     public Page<DishDto> pageWithCategoryName(int page, int pageSize, String name) {
         //构造分页对象
-        Page<Dish> dishPage=new Page<>(page,pageSize);
+        Page<Dish> dishPage = new Page<>(page, pageSize);
 
         //构造条件查询对象
-        LambdaQueryWrapper<Dish> dishLambdaQueryWrapper=new LambdaQueryWrapper<>();
-        dishLambdaQueryWrapper.eq(name!=null,Dish::getName,name);
+        LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        dishLambdaQueryWrapper.eq(name != null, Dish::getName, name);
         dishLambdaQueryWrapper.orderByAsc(Dish::getUpdateTime);
 
         //查询
-        this.page(dishPage,dishLambdaQueryWrapper);
+        this.page(dishPage, dishLambdaQueryWrapper);
 
         //构造DTO分页对象
-        Page<DishDto> dishDtoPage=new Page<>();
+        Page<DishDto> dishDtoPage = new Page<>();
         //将已经查询出来的dish分页对象复制到DTO分页对象,除了分页数据之外
-        BeanUtils.copyProperties(dishPage,dishDtoPage,"records");
+        BeanUtils.copyProperties(dishPage, dishDtoPage, "records");
 
         //首先获取dish分页数据
         List<Dish> records = dishPage.getRecords();
