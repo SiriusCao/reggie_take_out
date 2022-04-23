@@ -80,4 +80,11 @@ public class DishController {
         }
         return R.success("修改成功");
     }
+
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        log.info("删除菜品{}",ids.toString());
+        dishService.deleteWithFlavor(ids);
+        return R.success("删除成功");
+    }
 }

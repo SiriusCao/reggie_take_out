@@ -3,6 +3,7 @@ package com.cao.reggie.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cao.reggie.common.CustomException;
 import com.cao.reggie.common.R;
 import com.cao.reggie.dto.DishDto;
 import com.cao.reggie.entity.Category;
@@ -122,5 +123,22 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }).collect(Collectors.toList());
         //保存更新的口味
         dishFlavorService.saveBatch(flavors);
+    }
+
+    @Override
+    public void deleteWithFlavor(List<Long> ids) {
+        LambdaQueryWrapper<Dish> wrapper=new LambdaQueryWrapper<>();
+        wrapper.in(Dish::getId,ids);
+        wrapper.eq(Dish::getStatus,1);
+        int count = this.count(wrapper);
+        if (count>0){
+            throw new CustomException("菜品售卖中，无法删除");
+        }
+
+        this.removeByIds(ids);
+
+        LambdaQueryWrapper<DishFlavor> dishFlavorWrapper=new LambdaQueryWrapper<>();
+        dishFlavorWrapper.in(DishFlavor::getDishId,ids);
+        dishFlavorService.remove(dishFlavorWrapper);
     }
 }
