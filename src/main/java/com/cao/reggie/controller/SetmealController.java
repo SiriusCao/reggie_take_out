@@ -75,9 +75,16 @@ public class SetmealController {
     }
 
     @GetMapping("/{id}")
-    public R<SetmealDto> findById(@PathVariable Long id){
-        SetmealDto setmealDto=setmealService.findByIdWithDish(id);
+    public R<SetmealDto> findById(@PathVariable Long id) {
+        SetmealDto setmealDto = setmealService.findByIdWithDish(id);
         return R.success(setmealDto);
+    }
+
+    @PutMapping
+    public R<String> update(@RequestBody SetmealDto setmealDto) {
+        log.info("修改套餐{}", setmealDto.toString());
+        setmealService.updateWithDish(setmealDto);
+        return R.success("修改成功");
     }
 
 

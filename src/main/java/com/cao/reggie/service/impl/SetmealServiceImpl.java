@@ -46,17 +46,17 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
     @Override
     public Page<SetmealDto> pageWithCategoryName(int page, int pageSize, String name) {
-        Page<Setmeal> setmealPage=new Page<>(page,pageSize);
+        Page<Setmeal> setmealPage = new Page<>(page, pageSize);
 
-        LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.like(name!=null,Setmeal::getName,name);
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(name != null, Setmeal::getName, name);
         queryWrapper.orderByDesc(Setmeal::getUpdateTime);
 
-        this.page(setmealPage,queryWrapper);
+        this.page(setmealPage, queryWrapper);
 
-        Page<SetmealDto> setmealDtoPage=new Page<>();
+        Page<SetmealDto> setmealDtoPage = new Page<>();
 
-        BeanUtils.copyProperties(setmealPage,setmealDtoPage,"records");
+        BeanUtils.copyProperties(setmealPage, setmealDtoPage, "records");
 
         List<Setmeal> setmealList = setmealPage.getRecords();
         List<SetmealDto> setmealDtoList = setmealList.stream().map(item -> {
@@ -76,11 +76,11 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     @Override
     public void deleteWithDish(List<Long> ids) {
         //处于在售状态的套餐不能删除
-        LambdaQueryWrapper<Setmeal> wrapper=new LambdaQueryWrapper<>();
-        wrapper.in(Setmeal::getId,ids);
-        wrapper.eq(Setmeal::getStatus,1);
+        LambdaQueryWrapper<Setmeal> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(Setmeal::getId, ids);
+        wrapper.eq(Setmeal::getStatus, 1);
         int count = this.count(wrapper);
-        if (count>0){
+        if (count > 0) {
             throw new CustomException("套菜正在售卖中，不能删除");
         }
 
@@ -88,21 +88,40 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         this.removeByIds(ids);
 
         //等价于delete from setmeal_dish where setmeal_id in(1,2,3)
-        LambdaQueryWrapper<SetmealDish> setmealDishWrapper=new LambdaQueryWrapper<>();
-        setmealDishWrapper.in(SetmealDish::getSetmealId,ids);
+        LambdaQueryWrapper<SetmealDish> setmealDishWrapper = new LambdaQueryWrapper<>();
+        setmealDishWrapper.in(SetmealDish::getSetmealId, ids);
         setmealDishService.remove(setmealDishWrapper);
     }
 
     @Override
     public SetmealDto findByIdWithDish(Long id) {
         Setmeal setmeal = this.getById(id);
-        SetmealDto setmealDto=new SetmealDto();
-        BeanUtils.copyProperties(setmeal,setmealDto);
+        SetmealDto setmealDto = new SetmealDto();
+        BeanUtils.copyProperties(setmeal, setmealDto);
 
-        LambdaQueryWrapper<SetmealDish> wrapper=new LambdaQueryWrapper<>();
-        wrapper.eq(SetmealDish::getSetmealId,id);
+        LambdaQueryWrapper<SetmealDish> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SetmealDish::getSetmealId, id);
         List<SetmealDish> list = setmealDishService.list(wrapper);
         setmealDto.setSetmealDishes(list);
         return setmealDto;
+    }
+
+    @Override
+    public void updateWithDish(SetmealDto setmealDto) {
+        //更新套餐
+        this.updateById(setmealDto);
+
+        //删除套餐包含的旧的菜品
+        LambdaQueryWrapper<SetmealDish> setmealDishWrapper = new LambdaQueryWrapper<>();
+        setmealDishWrapper.eq(SetmealDish::getSetmealId, setmealDto.getId());
+        setmealDishService.remove(setmealDishWrapper);
+
+        //添加套餐更新之后所包含的菜品
+        List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
+        setmealDishes = setmealDishes.stream().map(item -> {
+            item.setSetmealId(setmealDto.getId());
+            return item;
+        }).collect(Collectors.toList());
+        setmealDishService.saveBatch(setmealDishes);
     }
 }

@@ -20,4 +20,7 @@ public interface SetmealService extends IService<Setmeal> {
 
     //根据id查询套餐及其包含的菜品
     public SetmealDto findByIdWithDish(Long id);
+
+    //修改套餐及其包含的菜品
+    public void updateWithDish(SetmealDto setmealDto);
 }
