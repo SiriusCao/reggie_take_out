@@ -74,5 +74,11 @@ public class SetmealController {
         return R.success("删除成功~");
     }
 
+    @GetMapping("/{id}")
+    public R<SetmealDto> findById(@PathVariable Long id){
+        SetmealDto setmealDto=setmealService.findByIdWithDish(id);
+        return R.success(setmealDto);
+    }
+
 
 }
