@@ -31,9 +31,10 @@ public class UserController {
         String phone = user.getPhone();
         log.info("手机号码{}发来验证码请求", phone);
         if (StringUtils.isNotEmpty(phone)){
-            String code = ValidateCodeUtils.generateValidateCode4String(6);
+            String code = ValidateCodeUtils.generateValidateCode(6).toString();
             ValueOperations ops = redisTemplate.opsForValue();
             ops.set(phone,code,300, TimeUnit.SECONDS);
+            log.info("验证码为{}",code);
             return R.success("发送成功");
         }
         return R.error("发送失败");
