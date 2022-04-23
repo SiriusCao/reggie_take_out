@@ -62,11 +62,22 @@ public class DishController {
     @GetMapping("/list")
     public R<List<Dish>> listByCategoryId(Dish dish) {
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Dish::getCategoryId,dish.getCategoryId());
+        queryWrapper.eq(Dish::getCategoryId, dish.getCategoryId());
         //只查询在售状态的
-        queryWrapper.eq(Dish::getStatus,1);
+        queryWrapper.eq(Dish::getStatus, 1);
         queryWrapper.orderByAsc(Dish::getSort).orderByAsc(Dish::getUpdateTime);
         List<Dish> dishList = dishService.list(queryWrapper);
         return R.success(dishList);
+    }
+
+    @PostMapping("/status/{flag}")
+    public R<String> status(@PathVariable int flag, @RequestParam List<Long> ids) {
+        for (Long id : ids) {
+            Dish dish = new Dish();
+            dish.setId(id);
+            dish.setStatus(flag);
+            dishService.updateById(dish);
+        }
+        return R.success("修改成功");
     }
 }
