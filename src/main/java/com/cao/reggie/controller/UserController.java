@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +37,7 @@ public class UserController {
      * @param user
      * @return
      */
-    @RequestMapping("/sendMsg")
+    @PostMapping("/sendMsg")
     public R<String> sendMsg(@RequestBody User user) {
         //获取手机号
         String phone = user.getPhone();
@@ -62,7 +63,7 @@ public class UserController {
      * @param phoneAndCode 存储手机号码和对应的短信验证码
      * @return
      */
-    @RequestMapping("/login")
+    @PostMapping("/login")
     public R<User> login(@RequestBody Map<String, String> phoneAndCode, HttpServletRequest request) {
         //获取传回的手机号和验证码
         String phone = phoneAndCode.get("phone");
