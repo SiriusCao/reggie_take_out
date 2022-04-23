@@ -53,12 +53,25 @@ public class SetmealController {
     @PostMapping("/status/{flag}")
     public R<String> status(@PathVariable int flag, @RequestParam List<Long> ids) {
         for (Long id : ids) {
-            Setmeal setmeal=new Setmeal();
+            Setmeal setmeal = new Setmeal();
             setmeal.setId(id);
             setmeal.setStatus(flag);
             setmealService.updateById(setmeal);
         }
         return R.success("修改成功~");
+    }
+
+    /**
+     * 删除套餐
+     *
+     * @param ids 待删除的id
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids) {
+        log.info("删除{}", ids.toString());
+        setmealService.deleteWithDish(ids);
+        return R.success("删除成功~");
     }
 
 
