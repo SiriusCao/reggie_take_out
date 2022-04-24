@@ -48,4 +48,13 @@ public class AddressBookController {
         return R.success("新增成功");
     }
 
+    @GetMapping("/{id}")
+    public R<AddressBook> listById(@PathVariable Long id){
+        AddressBook addressBook = addressBookService.getById(id);
+        if (addressBook!=null) {
+            return R.success(addressBook);
+        }
+        return R.error("操作失败");
+    }
+
 }
