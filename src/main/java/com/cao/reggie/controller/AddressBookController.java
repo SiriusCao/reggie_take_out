@@ -57,4 +57,13 @@ public class AddressBookController {
         return R.error("操作失败");
     }
 
+    @PutMapping
+    public R<String> update(@RequestBody AddressBook addressBook){
+        boolean b = addressBookService.updateById(addressBook);
+        if (b){
+            return R.success("修改成功");
+        }
+        return R.error("修改失败");
+    }
+
 }
