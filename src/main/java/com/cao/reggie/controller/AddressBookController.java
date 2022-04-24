@@ -43,7 +43,15 @@ public class AddressBookController {
 
     @PostMapping
     public R<String> add(@RequestBody AddressBook addressBook){
-        addressBook.setUserId(BaseContext.getCurrentId());
+        //如果是还未添加过地址的新用户，则把添加的第一个地址设为默认地址
+        Long currentId = BaseContext.getCurrentId();
+        LambdaQueryWrapper<AddressBook> wrapper=new LambdaQueryWrapper<>();
+        wrapper.eq(AddressBook::getUserId,currentId);
+        int count = addressBookService.count(wrapper);
+        if (count==0){
+            addressBook.setIsDefault(1);
+        }
+        addressBook.setUserId(currentId);
         addressBookService.save(addressBook);
         log.info("新增{}",addressBook.toString());
         return R.success("新增成功");
