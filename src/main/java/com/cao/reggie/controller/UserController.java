@@ -97,4 +97,11 @@ public class UserController {
         }
         return R.error("验证码错误");
     }
+
+    @PostMapping("/loginout")
+    public R<String> logout(HttpServletRequest request){
+        log.info("当前用户{}退出登录",request.getSession().getAttribute("user"));
+        request.getSession().removeAttribute("user");
+        return R.success("退出成功");
+    }
 }
