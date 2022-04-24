@@ -102,6 +102,7 @@
                             const res = await addressFindOneApi(params.id)
                             if(res.code === 1){
                                 this.form = res.data
+                                this.activeIndex=this.labelList.indexOf(this.form.label)
                             }else{
                                 this.$notify({ type:'warning', message:res.msg});
                             }
