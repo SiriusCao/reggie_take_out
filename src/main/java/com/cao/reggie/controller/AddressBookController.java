@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -74,6 +75,26 @@ public class AddressBookController {
             return R.success("删除成功");
         }
         return R.error("删除失败");
+    }
+
+    @PutMapping("/default")
+    public R<String> updateDefault(@RequestBody AddressBook addressBook){
+        //将所有默认地址取消
+        LambdaQueryWrapper<AddressBook> wrapper=new LambdaQueryWrapper<>();
+        wrapper.eq(AddressBook::getUserId,BaseContext.getCurrentId());
+        List<AddressBook> list = addressBookService.list(wrapper);
+        list = list.stream().map(item -> {
+            item.setIsDefault(0);
+            return item;
+        }).collect(Collectors.toList());
+        addressBookService.updateBatchById(list);
+
+        //更改默认地址
+        addressBook.setIsDefault(1);
+        addressBookService.updateById(addressBook);
+
+        return R.success("修改成功");
+
     }
 
 }
