@@ -24,7 +24,7 @@
             <div class="divUser">
                 <img src="./../images/headPage.png"/>
                 <div class="desc">
-                    <div class="divName">林之迷 <img src="./../images/women.png"/></div>
+                    <div class="divName">{{userName}}</div>
                     <div class="divPhone">{{userPhone}}</div>
                 </div>
             </div>
@@ -107,6 +107,7 @@
             computed:{},
             created(){
                 this.userPhone =sessionStorage.getItem("userPhone")
+                this.userName=sessionStorage.getItem("userName")
                 this.initData()
             },
             mounted(){},

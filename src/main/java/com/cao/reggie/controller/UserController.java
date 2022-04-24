@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -87,6 +88,7 @@ public class UserController {
                 user = new User();
                 user.setPhone(phone);
                 user.setStatus(1);
+                user.setName("用户"+ UUID.randomUUID().toString().substring(0,8));
                 userService.save(user);
             }
             //登录

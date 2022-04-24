@@ -76,6 +76,7 @@
                         this.loading = false
                         if(res.code === 1){
                             sessionStorage.setItem("userPhone",this.form.phone)
+                            sessionStorage.setItem("userName",res.data.name)
                             window.requestAnimationFrame(()=>{
                                 window.location.href= '/front/index.html'
                             })                           
