@@ -66,4 +66,14 @@ public class AddressBookController {
         return R.error("修改失败");
     }
 
+    @DeleteMapping()
+    public R<String> delete(Long id){
+        boolean b = addressBookService.removeById(id);
+        if (b){
+            log.info("删除{}",id);
+            return R.success("删除成功");
+        }
+        return R.error("删除失败");
+    }
+
 }
