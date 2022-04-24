@@ -126,7 +126,8 @@
                         })
                     },
                     async initData(){
-                        const res = await addressListApi()
+                        var loginUserPhone = sessionStorage.getItem("userPhone");
+                        const res = await addressListApi(loginUserPhone)
                         if(res.code === 1){
                             this.addressList = res.data
                         }else{

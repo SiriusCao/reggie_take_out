@@ -1,7 +1,7 @@
 //获取所有地址
-function addressListApi() {
+function addressListApi(loginUserPhone) {
     return $axios({
-      'url': '/addressBook/list',
+      'url': '/addressBook/list/'+loginUserPhone,
       'method': 'get',
     })
   }
