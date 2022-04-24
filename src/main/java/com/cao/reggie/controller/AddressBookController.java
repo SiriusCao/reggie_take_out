@@ -94,7 +94,18 @@ public class AddressBookController {
         addressBookService.updateById(addressBook);
 
         return R.success("修改成功");
+    }
 
+    @GetMapping("/default")
+    public R<AddressBook> getdefault(){
+        Long currentId = BaseContext.getCurrentId();
+        LambdaQueryWrapper<AddressBook> wrapper=new LambdaQueryWrapper<>();
+        wrapper.eq(AddressBook::getUserId,currentId).eq(AddressBook::getIsDefault,1);
+        AddressBook addressBook = addressBookService.getOne(wrapper);
+        if (addressBook!=null){
+            return R.success(addressBook);
+        }
+        return R.error("没有找到该对象");
     }
 
 }
