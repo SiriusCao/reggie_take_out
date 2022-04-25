@@ -1,12 +1,15 @@
 package com.cao.reggie.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.cao.reggie.common.BaseContext;
 import com.cao.reggie.common.R;
 import com.cao.reggie.entity.ShoppingCart;
+import com.cao.reggie.service.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -14,8 +17,42 @@ import java.util.List;
 @RequestMapping("/shoppingCart")
 public class ShoppingCartController {
 
+    @Autowired
+    private ShoppingCartService shoppingCartService;
+
     @GetMapping("/list")
-    public R<List<ShoppingCart>> list(){
+    public R<List<ShoppingCart>> list() {
         return null;
     }
+
+    @PostMapping("/add")
+    public R<ShoppingCart> add(@RequestBody ShoppingCart shoppingCart) {
+        //获取当前用户的id
+        Long currentId = BaseContext.getCurrentId();
+        shoppingCart.setUserId(currentId);
+        LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ShoppingCart::getUserId, currentId);
+
+        //先查询购物车是否有重复的，有则number+1，否则插入新纪录
+        Long dishId = shoppingCart.getDishId();
+        if (dishId != null) {
+            wrapper.eq(ShoppingCart::getDishId, dishId);
+            wrapper.eq(shoppingCart.getDishFlavor()!=null,ShoppingCart::getDishFlavor, shoppingCart.getDishFlavor());
+        } else {
+            wrapper.eq(ShoppingCart::getSetmealId, shoppingCart.getSetmealId());
+        }
+        ShoppingCart one = shoppingCartService.getOne(wrapper);
+        if (one != null) {
+            Integer number = one.getNumber();
+            one.setNumber(number + 1);
+            shoppingCartService.updateById(one);
+        } else {
+            shoppingCart.setNumber(1);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            shoppingCartService.save(shoppingCart);
+            one=shoppingCart;
+        }
+        return R.success(one);
+    }
+
 }
