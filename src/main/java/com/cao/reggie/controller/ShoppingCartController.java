@@ -22,7 +22,11 @@ public class ShoppingCartController {
 
     @GetMapping("/list")
     public R<List<ShoppingCart>> list() {
-        return null;
+        LambdaQueryWrapper<ShoppingCart> wrapper=new LambdaQueryWrapper<>();
+        wrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());
+        wrapper.orderByAsc(ShoppingCart::getCreateTime);
+        List<ShoppingCart> shoppingCartList = shoppingCartService.list(wrapper);
+        return R.success(shoppingCartList);
     }
 
     @PostMapping("/add")
