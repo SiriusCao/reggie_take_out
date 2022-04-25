@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cao.reggie.common.R;
 import com.cao.reggie.dto.SetmealDto;
+import com.cao.reggie.entity.Dish;
 import com.cao.reggie.entity.Setmeal;
+import com.cao.reggie.entity.SetmealDish;
+import com.cao.reggie.service.DishService;
 import com.cao.reggie.service.SetmealDishService;
 import com.cao.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -23,6 +27,9 @@ public class SetmealController {
 
     @Autowired
     private SetmealDishService setmealDishService;
+
+    @Autowired
+    private DishService dishService;
 
     /**
      * 新增套餐
@@ -94,6 +101,17 @@ public class SetmealController {
                 .eq(Setmeal::getStatus, 1);
         List<Setmeal> setmealList = setmealService.list(wrapper);
         return R.success(setmealList);
+    }
+
+    @GetMapping("/dish/{setmealId}")
+    public R<List<Dish>> dish(@PathVariable Long setmealId) {
+        List<SetmealDish> setmealDishList = setmealDishService.list(
+                new LambdaQueryWrapper<SetmealDish>()
+                        .eq(SetmealDish::getSetmealId, setmealId));
+        List<Dish> dishList = setmealDishList.stream().map(item -> {
+            return dishService.getById(item.getDishId());
+        }).collect(Collectors.toList());
+        return R.success(dishList);
     }
 
 
