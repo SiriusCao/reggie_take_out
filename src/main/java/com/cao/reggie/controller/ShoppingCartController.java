@@ -22,8 +22,8 @@ public class ShoppingCartController {
 
     @GetMapping("/list")
     public R<List<ShoppingCart>> list() {
-        LambdaQueryWrapper<ShoppingCart> wrapper=new LambdaQueryWrapper<>();
-        wrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());
+        LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
         wrapper.orderByAsc(ShoppingCart::getCreateTime);
         List<ShoppingCart> shoppingCartList = shoppingCartService.list(wrapper);
         return R.success(shoppingCartList);
@@ -41,7 +41,7 @@ public class ShoppingCartController {
         Long dishId = shoppingCart.getDishId();
         if (dishId != null) {
             wrapper.eq(ShoppingCart::getDishId, dishId);
-            wrapper.eq(shoppingCart.getDishFlavor()!=null,ShoppingCart::getDishFlavor, shoppingCart.getDishFlavor());
+            wrapper.eq(shoppingCart.getDishFlavor() != null, ShoppingCart::getDishFlavor, shoppingCart.getDishFlavor());
         } else {
             wrapper.eq(ShoppingCart::getSetmealId, shoppingCart.getSetmealId());
         }
@@ -54,9 +54,20 @@ public class ShoppingCartController {
             shoppingCart.setNumber(1);
             shoppingCart.setCreateTime(LocalDateTime.now());
             shoppingCartService.save(shoppingCart);
-            one=shoppingCart;
+            one = shoppingCart;
         }
         return R.success(one);
+    }
+
+    @DeleteMapping("/clean")
+    public R<String> clean() {
+        LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
+        boolean remove = shoppingCartService.remove(wrapper);
+        if (remove) {
+            return R.success("删除成功");
+        }
+        return R.error("删除失败");
     }
 
 }
