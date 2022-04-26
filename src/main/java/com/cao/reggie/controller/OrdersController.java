@@ -45,7 +45,7 @@ public class OrdersController {
 
     @GetMapping("/userPage")
     public R<Page<OrdersDto>> page(int page, int pageSize) {
-        Page<Orders> pageInfo = new Page<>();
+        Page<Orders> pageInfo = new Page<>(page, pageSize);
         LambdaQueryWrapper<Orders> ordersWrapper = new LambdaQueryWrapper<>();
         ordersWrapper.eq(Orders::getUserId, BaseContext.getCurrentId());
         ordersWrapper.orderByDesc(Orders::getOrderTime);
@@ -77,7 +77,7 @@ public class OrdersController {
      * @return
      */
     @PostMapping("/again")
-    public R<String> againOrder(@RequestBody Orders orders){
+    public R<String> againOrder(@RequestBody Orders orders) {
         //获取要重复下单的订单号
         Long orderId = orders.getId();
         //根据订单号获取订单内容
