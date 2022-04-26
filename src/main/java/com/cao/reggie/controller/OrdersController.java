@@ -19,6 +19,8 @@ public class OrdersController {
 
     @PostMapping("/submit")
     public R<String> submit(@RequestBody Orders orders){
-        return null;
+        log.info("提交订单{}",orders.toString());
+        ordersService.submit(orders);
+        return R.success("提交成功");
     }
 }
