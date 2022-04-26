@@ -6,6 +6,7 @@ import com.cao.reggie.common.BaseContext;
 import com.cao.reggie.common.R;
 import com.cao.reggie.dto.OrdersDto;
 import com.cao.reggie.entity.OrderDetail;
+import com.cao.reggie.entity.OrderMap;
 import com.cao.reggie.entity.Orders;
 import com.cao.reggie.entity.ShoppingCart;
 import com.cao.reggie.service.OrderDetailService;
@@ -16,10 +17,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -114,5 +118,35 @@ public class OrdersController {
             return R.success("");
         }
         return R.error("未知错误");
+    }
+
+    @GetMapping("/page")
+    public R<Page<Orders>> page(OrderMap orderMap) {
+        Integer page = orderMap.getPage();
+        Integer pageSize = orderMap.getPageSize();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        LocalDateTime beginTime = null;
+        LocalDateTime endTime = null;
+
+        if (orderMap.getBeginTime() != null) {
+            beginTime = LocalDateTime.parse(orderMap.getBeginTime(), formatter);
+        }
+        if (orderMap.getEndTime() != null) {
+            endTime = LocalDateTime.parse(orderMap.getEndTime(), formatter);
+        }
+
+        String number = orderMap.getNumber();
+
+        Page<Orders> pageInfo = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Orders> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(number != null, Orders::getNumber, number);
+        wrapper.ge(beginTime != null, Orders::getOrderTime, beginTime);
+        wrapper.le(endTime != null, Orders::getOrderTime, endTime);
+
+        ordersService.page(pageInfo, wrapper);
+
+        return R.success(pageInfo);
     }
 }
