@@ -88,7 +88,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         orders.setNumber(String.valueOf(orderId));
         orders.setOrderTime(LocalDateTime.now());
         orders.setPayMethod(2);
-        orders.setPhone(addressBook.getPhone());
+        orders.setPhone(user.getPhone());
         orders.setStatus(4);
         orders.setUserId(currentId);
         orders.setUserName(user.getName());
