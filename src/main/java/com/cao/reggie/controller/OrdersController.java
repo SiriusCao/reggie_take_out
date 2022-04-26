@@ -40,6 +40,7 @@ public class OrdersController {
         Page<Orders> pageInfo=new Page<>();
         LambdaQueryWrapper<Orders> ordersWrapper=new LambdaQueryWrapper<>();
         ordersWrapper.eq(Orders::getUserId, BaseContext.getCurrentId());
+        ordersWrapper.orderByDesc(Orders::getOrderTime);
         ordersService.page(pageInfo,ordersWrapper);
 
         Page<OrdersDto> pageDtoInfo=new Page<>();
