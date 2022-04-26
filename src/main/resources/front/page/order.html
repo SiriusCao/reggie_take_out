@@ -39,6 +39,9 @@
                         </div>
                         <div class="dishList">
                             <div v-for="(item,index) in order.orderDetails" :key="index" class="item">
+                                <el-image :src="getImage(item.image)"
+                                          :preview-src-list="[ `/common/download?name=${item.image}` ]" >
+                                </el-image>
                                 <span>{{item.name}}</span>
                                 <span>x{{item.number}}</span>
                             </div>
@@ -139,6 +142,9 @@
                     }else{
                         this.$notify({ type:'warning', message:res.msg});
                     }
+                },
+                getImage (image) {
+                    return `/common/download?name=${image}`
                 },
                 getStatus(status){
                     let str = ''
