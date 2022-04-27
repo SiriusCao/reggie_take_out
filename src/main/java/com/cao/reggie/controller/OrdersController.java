@@ -1,6 +1,7 @@
 package com.cao.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cao.reggie.common.BaseContext;
 import com.cao.reggie.common.R;
@@ -156,7 +157,7 @@ public class OrdersController {
             OrdersDto ordersDto = new OrdersDto();
             BeanUtils.copyProperties(item, ordersDto);
             LambdaQueryWrapper<OrderDetail> wrapper1 = new LambdaQueryWrapper<>();
-            wrapper1.eq(OrderDetail::getOrderId, item.getNumber());
+            wrapper1.eq(OrderDetail::getOrderId, item.getId());
             List<OrderDetail> orderDetails = orderDetailService.list(wrapper1);
             ordersDto.setOrderDetails(orderDetails);
             return ordersDto;
@@ -165,5 +166,14 @@ public class OrdersController {
         ordersDtoPageInfo.setRecords(ordersDtoList);
 
         return R.success(ordersDtoPageInfo);
+    }
+
+    @PutMapping
+    public R<String> updateStatus(@RequestBody Orders orders){
+        boolean b = ordersService.updateById(orders);
+        if (b) {
+            return R.success("修改成功");
+        }
+        return R.error("未知错误");
     }
 }
