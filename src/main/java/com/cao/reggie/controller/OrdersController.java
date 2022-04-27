@@ -121,7 +121,7 @@ public class OrdersController {
     }
 
     @GetMapping("/page")
-    public R<Page<Orders>> page(OrderMap orderMap) {
+    public R<Page<OrdersDto>> page(OrderMap orderMap) {
         Integer page = orderMap.getPage();
         Integer pageSize = orderMap.getPageSize();
 
@@ -144,9 +144,26 @@ public class OrdersController {
         wrapper.like(number != null, Orders::getNumber, number);
         wrapper.ge(beginTime != null, Orders::getOrderTime, beginTime);
         wrapper.le(endTime != null, Orders::getOrderTime, endTime);
+        wrapper.orderByDesc(Orders::getOrderTime);
 
         ordersService.page(pageInfo, wrapper);
 
-        return R.success(pageInfo);
+        Page<OrdersDto> ordersDtoPageInfo=new Page<>();
+        BeanUtils.copyProperties(pageInfo,ordersDtoPageInfo,"records");
+
+        List<Orders> ordersList = pageInfo.getRecords();
+        List<OrdersDto> ordersDtoList = ordersList.stream().map(item -> {
+            OrdersDto ordersDto = new OrdersDto();
+            BeanUtils.copyProperties(item, ordersDto);
+            LambdaQueryWrapper<OrderDetail> wrapper1 = new LambdaQueryWrapper<>();
+            wrapper1.eq(OrderDetail::getOrderId, item.getNumber());
+            List<OrderDetail> orderDetails = orderDetailService.list(wrapper1);
+            ordersDto.setOrderDetails(orderDetails);
+            return ordersDto;
+        }).collect(Collectors.toList());
+
+        ordersDtoPageInfo.setRecords(ordersDtoList);
+
+        return R.success(ordersDtoPageInfo);
     }
 }
