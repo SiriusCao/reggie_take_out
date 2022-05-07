@@ -93,6 +93,7 @@ public class UserController {
             }
             //登录
             request.getSession().setAttribute("user",user.getId());
+            redisTemplate.delete(phone);
             return R.success(user);
         }
         return R.error("验证码错误");
