@@ -15,6 +15,7 @@ import com.cao.reggie.service.DishFlavorService;
 import com.cao.reggie.service.DishService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public void saveWithFlavor(DishDto dishDto) {
@@ -133,6 +137,14 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         int count = this.count(wrapper);
         if (count>0){
             throw new CustomException("菜品售卖中，无法删除");
+        }
+
+        //清除该菜品分类下的redis缓存
+        for (Long id : ids) {
+            Dish dish = this.getById(id);
+            Long categoryId = dish.getCategoryId();
+            String key="dish_"+categoryId+"_1";
+            redisTemplate.delete(key);
         }
 
         this.removeByIds(ids);
