@@ -12,6 +12,8 @@ import com.cao.reggie.service.SetmealDishService;
 import com.cao.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,6 +40,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping
+    @CacheEvict(value = "SetmealCache",allEntries = true)
     public R<String> save(@RequestBody SetmealDto setmealDto) {
         log.info("新增套餐{}", setmealDto);
         setmealService.saveWithDish(setmealDto);
@@ -58,6 +61,7 @@ public class SetmealController {
      * @return 操作结果
      */
     @PostMapping("/status/{flag}")
+    @CacheEvict(value = "SetmealCache",allEntries = true)
     public R<String> status(@PathVariable int flag, @RequestParam List<Long> ids) {
         for (Long id : ids) {
             Setmeal setmeal = new Setmeal();
@@ -88,6 +92,7 @@ public class SetmealController {
     }
 
     @PutMapping
+    @CacheEvict(value = "SetmealCache",allEntries = true)
     public R<String> update(@RequestBody SetmealDto setmealDto) {
         log.info("修改套餐{}", setmealDto.toString());
         setmealService.updateWithDish(setmealDto);
@@ -95,6 +100,7 @@ public class SetmealController {
     }
 
     @GetMapping("/list")
+    @Cacheable(value = "SetmealCache", key = "#setmeal.categoryId + '_' + #setmeal.status")
     public R<List<Setmeal>> list(Setmeal setmeal) {
         LambdaQueryWrapper<Setmeal> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Setmeal::getCategoryId, setmeal.getCategoryId())
@@ -104,6 +110,7 @@ public class SetmealController {
     }
 
     @GetMapping("/dish/{setmealId}")
+    @Cacheable(value = "SetmealCache" , key = "#setmealId")
     public R<List<Dish>> dish(@PathVariable Long setmealId) {
         List<SetmealDish> setmealDishList = setmealDishService.list(
                 new LambdaQueryWrapper<SetmealDish>()
